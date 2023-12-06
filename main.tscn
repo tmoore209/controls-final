@@ -1,0 +1,120 @@
+[gd_scene load_steps=8 format=3 uid="uid://bcqubqgy7rjyt"]
+
+[ext_resource type="Texture2D" uid="uid://dk045rc8yl6ye" path="res://circle.png" id="1_s0p4f"]
+[ext_resource type="Script" path="res://Beam.gd" id="1_yejlv"]
+[ext_resource type="Texture2D" uid="uid://1pj68oo2ji6l" path="res://icon.svg" id="2_8hfpa"]
+[ext_resource type="Script" path="res://PidController.gd" id="3_8wvai"]
+[ext_resource type="Script" path="res://CameraController.gd" id="4_qy2o7"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_27mcu"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fadax"]
+size = Vector2(1150, 20)
+
+[node name="Root" type="Node2D"]
+
+[node name="Ball" type="Node2D" parent="."]
+
+[node name="RigidBody2D" type="RigidBody2D" parent="Ball"]
+position = Vector2(575, 222)
+
+[node name="Sprite2D" type="Sprite2D" parent="Ball/RigidBody2D"]
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("1_s0p4f")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ball/RigidBody2D"]
+shape = SubResource("CircleShape2D_27mcu")
+
+[node name="Beam" type="Node2D" parent="."]
+script = ExtResource("1_yejlv")
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="Beam"]
+position = Vector2(575, 298)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Beam/CharacterBody2D"]
+shape = SubResource("RectangleShape2D_fadax")
+
+[node name="ColorRect" type="ColorRect" parent="Beam/CharacterBody2D"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -580.0
+offset_top = -10.0
+offset_right = 580.0
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Sprite2D" type="Sprite2D" parent="Beam/CharacterBody2D"]
+modulate = Color(0, 0, 0, 1)
+scale = Vector2(0.05, 0.16)
+texture = ExtResource("2_8hfpa")
+
+[node name="Camera2D" type="Camera2D" parent="Beam"]
+anchor_mode = 0
+script = ExtResource("4_qy2o7")
+
+[node name="VelocityPID" type="Node" parent="Beam"]
+script = ExtResource("3_8wvai")
+K_p = 0.119
+K_i = 0.025
+K_d = 0.005
+
+[node name="PositionPID" type="Node" parent="Beam"]
+script = ExtResource("3_8wvai")
+K_p = 2.9
+K_i = 0.245
+K_d = 1.124
+
+[node name="HSlider" type="HSlider" parent="."]
+offset_top = 324.0
+offset_right = 1148.0
+offset_bottom = 340.0
+min_value = -575.0
+max_value = 575.0
+tick_count = 11
+ticks_on_borders = true
+
+[node name="Label" type="Label" parent="HSlider"]
+layout_mode = 0
+offset_top = 16.0
+offset_right = 40.0
+offset_bottom = 42.0
+text = "-575"
+
+[node name="Label2" type="Label" parent="HSlider"]
+layout_mode = 0
+offset_left = 1119.0
+offset_top = 16.0
+offset_right = 1159.0
+offset_bottom = 42.0
+text = "575"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ValueLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Velocity:"
+
+[node name="GoalLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Goal      :"
+
+[node name="kp" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Kp: "
+
+[node name="ki" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Ki: "
+
+[node name="kd" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Kd: "
+
+[connection signal="mode_change" from="Beam" to="Beam/VelocityPID" method="_on_beam_mode_change" unbinds=1]
+[connection signal="mode_change" from="Beam" to="Beam/PositionPID" method="_on_beam_mode_change" unbinds=1]
